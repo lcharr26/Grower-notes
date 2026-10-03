@@ -10,7 +10,7 @@ in IndexedDB. There are no accounts and no server.
 ## Build progress
 
 1. [x] Data model, local storage and full export (with restore)
-2. [ ] Setup flow (site and beds) and sample data
+2. [x] Setup flow (site and beds) and sample data
 3. [ ] Quick note capture and inbox
 4. [ ] Bed dashboard
 5. [ ] Plantings, harvest log and gap-fill prompt
@@ -52,4 +52,8 @@ Pages works; just upload the folder.)
 - `js/db.js`: IndexedDB storage
 - `js/zip.js`: dependency-free zip writer and reader
 - `js/backup.js`: export, restore and saving the file
-- `js/app.js`: the current (step 1) screen
+- `js/garden.js`: sites and beds, plus loading and removing the sample garden
+- `js/sample.js`: the sample (Derby) garden data
+- `js/ui.js`: small shared UI helpers
+- `js/app.js`: the screen router
+- `js/views/`: one file per screen (welcome, site, beds, home, settings)

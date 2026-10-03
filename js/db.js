@@ -133,6 +133,21 @@ export async function replaceAll(data) {
   await done(tx);
 }
 
+// Remove a site and every record that belongs to it, in one transaction.
+export async function deleteSite(siteId) {
+  const stores = STORES.filter((s) => s !== 'settings' && s !== 'sites');
+  const db = await openDb();
+  const tx = db.transaction([...stores, 'sites'], 'readwrite');
+  tx.objectStore('sites').delete(siteId);
+  for (const name of stores) {
+    const store = tx.objectStore(name);
+    store.index('site_id').getAllKeys(siteId).onsuccess = (e) => {
+      for (const key of e.target.result) store.delete(key);
+    };
+  }
+  await done(tx);
+}
+
 export async function clearAll() {
   await replaceAll({});
 }
