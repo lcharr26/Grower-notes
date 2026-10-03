@@ -1,0 +1,55 @@
+# Growers Notebook
+
+A quick, offline growing log for gardeners and growers. Logging something
+should take under 15 seconds: photo first, a few words, tag later.
+
+It's a Progressive Web App (PWA). It's plain HTML, CSS and JavaScript with no
+build step and no runtime dependencies, and everything is stored on the device
+in IndexedDB. There are no accounts and no server.
+
+## Build progress
+
+1. [x] Data model, local storage and full export (with restore)
+2. [ ] Setup flow (site and beds) and sample data
+3. [ ] Quick note capture and inbox
+4. [ ] Bed dashboard
+5. [ ] Plantings, harvest log and gap-fill prompt
+6. [ ] Question queue and photo prompt
+7. [ ] Export reminder nudge
+8. [ ] Offline/installable PWA, tested on a real phone
+
+## Backup format
+
+"Export everything" makes one `.zip` that any computer can open:
+
+- `data.json`: every record (sites, beds, varieties, plantings, notes,
+  harvests, questions, settings)
+- `photos/<id>.jpg`: every photo as an ordinary image file
+- `README.txt`: a plain-words description
+
+"Restore from a backup" reads the same file back. It replaces what's on the
+device in one go, so a failed restore never leaves half the data.
+
+## Running it
+
+```sh
+npm run serve        # http://localhost:8080
+npm install && npm test
+```
+
+### Trying it on a phone
+
+The phone needs to load the app over HTTPS, which offline mode and installing
+also require. The easiest way is GitHub Pages: in the repo, go to Settings >
+Pages, choose "Deploy from a branch", pick this branch and `/ (root)`, then
+open the URL it gives you on the phone. (Pages on a private repo needs a paid
+GitHub plan. Otherwise, any static host such as Netlify Drop or Cloudflare
+Pages works; just upload the folder.)
+
+## Code layout
+
+- `js/model.js`: record shapes and allowed values (each record has a `site_id`)
+- `js/db.js`: IndexedDB storage
+- `js/zip.js`: dependency-free zip writer and reader
+- `js/backup.js`: export, restore and saving the file
+- `js/app.js`: the current (step 1) screen
