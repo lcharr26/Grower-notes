@@ -8,6 +8,7 @@ import * as db from './db.js';
 import { upgradeSampleSites } from './garden.js';
 import { STORES } from './model.js';
 import { createZip, readZip } from './zip.js';
+import { megabytes, toast } from './ui.js';
 
 export const FORMAT = 'growers-notebook';
 export const FORMAT_VERSION = 1;
@@ -29,7 +30,7 @@ any text editor or spreadsheet tool.
 The photos folder holds every photo as an ordinary image file. Each photo's
 entry in data.json ("photos") says which note it belongs to.
 
-To restore, open Growers Notebook > Dashboard > Backup > Restore from a backup and pick
+To restore, open Growers Notebook > Settings > Restore from a backup and pick
 this file.
 `;
 
@@ -116,4 +117,14 @@ export async function saveFile(blob, filename, { preferShare = true } = {}) {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 60_000);
   return 'downloaded';
+}
+
+// Export, hand the file over, and remember when. Returns false if cancelled.
+export async function exportNow() {
+  const { blob, filename, exportedAt } = await buildExport();
+  const outcome = await saveFile(blob, filename);
+  if (outcome === 'cancelled') return false;
+  await db.setSetting('last_export', exportedAt);
+  toast(`Exported ${filename} (${megabytes(blob.size)}).`);
+  return true;
 }

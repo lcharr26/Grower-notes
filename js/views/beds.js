@@ -1,5 +1,5 @@
 // Beds: the list first, with adding tucked behind a button. Used during
-// first setup and later from Dashboard > Garden setup.
+// first setup and later from Settings.
 
 import {
   LOCATION_LABELS, NUMBERED_PREFIX, addBed, addNumberedBeds, bedsForSite, currentSite,
@@ -120,8 +120,8 @@ export async function render(root, { setup, edit = null }) {
     h('section', { class: 'card' }, list),
     h('button', {
       class: setup ? 'primary' : '',
-      onclick: () => go(setup ? '#/' : edit ? `#/bed?id=${encodeURIComponent(edit)}` : '#/dashboard'),
-    }, setup ? 'Done, take me to the garden' : edit ? 'Back to the bed' : 'Back to dashboard'),
+      onclick: () => go(setup ? '#/' : edit ? `#/bed?id=${encodeURIComponent(edit)}` : '#/settings'),
+    }, setup ? 'Done, take me to the garden' : edit ? 'Back to the bed' : 'Back to settings'),
   );
   await refresh();
 }

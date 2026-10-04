@@ -1,18 +1,18 @@
-// What the dashboard shows, and in what order. The user picks; we remember.
+// What the home screen shows, and in what order. The user picks; we remember.
 // New sections added in later versions slot in at their default place
-// without disturbing choices already made.
+// without disturbing choices already made. (Stored per device for now; with
+// accounts in a later version it becomes per person.)
 
 import * as db from './db.js';
 
-// [id, label, shown by default]
+// [id, label, shown by default]. Cards with nothing to report stay hidden
+// even when switched on, so Home only shows what matters right now.
 export const SECTIONS = [
   ['shortcuts', 'Shortcuts', true],
   ['tidy', 'Notes to tidy', true],
   ['questions', 'Open questions', true],
+  ['beds', 'Beds', true],
   ['recent', 'Recent notes', false],
-  ['backup', 'Backup', true],
-  ['garden', 'Garden setup', true],
-  ['storage', 'Storage on this phone', false],
 ];
 
 // [id, label, shown by default]
@@ -21,9 +21,9 @@ export const SHORTCUTS = [
   ['tasks', 'Tasks', true],
   ['notes', 'All notes', true],
   ['export', 'Export backup', true],
-  ['beds-home', 'Beds', false],
   ['beds', 'Add or edit beds', false],
   ['site', 'Garden details', false],
+  ['settings', 'Settings', false],
 ];
 
 // Turns saved choices into a full ordered list: [{ id, label, on }].
@@ -61,13 +61,14 @@ export function toggle(list, id) {
 const strip = (list) => list.map(({ id, on }) => ({ id, on }));
 
 export async function loadLayout() {
-  const { dashboard } = await db.getSettings();
+  const settings = await db.getSettings();
+  const saved = settings.home_layout || settings.dashboard; // earlier builds used 'dashboard'
   return {
-    sections: resolve(SECTIONS, dashboard?.sections),
-    shortcuts: resolve(SHORTCUTS, dashboard?.shortcuts),
+    sections: resolve(SECTIONS, saved?.sections),
+    shortcuts: resolve(SHORTCUTS, saved?.shortcuts),
   };
 }
 
 export async function saveLayout({ sections, shortcuts }) {
-  await db.setSetting('dashboard', { sections: strip(sections), shortcuts: strip(shortcuts) });
+  await db.setSetting('home_layout', { sections: strip(sections), shortcuts: strip(shortcuts) });
 }

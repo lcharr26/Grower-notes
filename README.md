@@ -27,7 +27,7 @@ in IndexedDB. There are no accounts and no server.
 - `photos/<id>.jpg`: every photo as an ordinary image file
 - `README.txt`: a plain-words description
 
-Both live in Dashboard > Backup. "Restore from a backup" reads the same file back. It replaces what's on the
+Both live in Settings. "Restore from a backup" reads the same file back. It replaces what's on the
 device in one go, so a failed restore never leaves half the data.
 
 ## Running it
@@ -57,10 +57,10 @@ Pages works; just upload the folder.)
 - `js/notes.js`: saving, tagging and deleting notes; untagged notes wait in Tasks
 - `js/bedview.js`: each bed's current crops, last note, open questions and history
 - `js/notecard.js`: the note card (view, tag, edit, delete) used on several screens
-- `js/dashboard.js`: which dashboard cards and shortcuts show, and their order
+- `js/homelayout.js`: which Home cards and shortcuts show, and their order
 - `js/photos.js`: shrinking photos before they're stored
 - `js/capture.js`: the quick note sheet behind the "+ Note" button
 - `js/tags.js`: bed / crop / kind options for tagging
 - `js/ui.js`: small shared UI helpers
 - `js/app.js`: the screen router
-- `js/views/`: one file per screen (welcome, site, beds, home, bed, notes/tasks, dashboard)
+- `js/views/`: one file per screen (welcome, site, beds, home, bed, notes/tasks, settings, customise)

@@ -8,14 +8,15 @@ import { releasePhotoUrls } from './photos.js';
 import { go, h } from './ui.js';
 import * as bed from './views/bed.js';
 import * as beds from './views/beds.js';
-import * as dashboard from './views/dashboard.js';
+import * as customise from './views/customise.js';
 import * as home from './views/home.js';
 import * as notes from './views/notes.js';
+import * as settings from './views/settings.js';
 import * as site from './views/site.js';
 import * as welcome from './views/welcome.js';
 
 const app = document.getElementById('app');
-const dashboardLink = document.getElementById('dashboard-link');
+const settingsLink = document.getElementById('settings-link');
 const tasksLink = document.getElementById('tasks-link');
 const captureBtn = document.getElementById('capture-btn');
 
@@ -28,10 +29,11 @@ const ROUTES = {
   beds: (q) => beds.render(app, { setup: q.has('setup'), edit: q.get('edit') }),
   tasks: () => notes.render(app, { tasks: true }),
   notes: () => notes.render(app, { tasks: false }),
-  dashboard: (q) => dashboard.render(app, { customise: q.has('customise') }),
+  settings: () => settings.render(app),
+  customise: () => customise.render(app),
   // Old addresses, in case they're bookmarked.
   inbox: () => location.replace('#/tasks'),
-  settings: () => location.replace('#/dashboard'),
+  dashboard: () => location.replace('#/'),
 };
 
 // Screens shown before a garden exists, without the garden controls.
@@ -55,8 +57,8 @@ async function route() {
       return;
     }
     const setup = SETUP_ROUTES.includes(path);
-    dashboardLink.hidden = tasksLink.hidden = captureBtn.hidden = setup;
-    dashboardLink.setAttribute('aria-current', path === 'dashboard' ? 'page' : 'false');
+    settingsLink.hidden = tasksLink.hidden = captureBtn.hidden = setup;
+    settingsLink.setAttribute('aria-current', path === 'settings' || path === 'customise' ? 'page' : 'false');
     tasksLink.setAttribute('aria-current', path === 'tasks' ? 'page' : 'false');
     await updateTasksLink(current?.id);
     await show(new URLSearchParams(query));

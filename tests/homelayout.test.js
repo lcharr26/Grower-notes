@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import * as db from '../js/db.js';
-import { SECTIONS, SHORTCUTS, loadLayout, move, resolve, saveLayout, toggle } from '../js/dashboard.js';
+import { SECTIONS, SHORTCUTS, loadLayout, move, resolve, saveLayout, toggle } from '../js/homelayout.js';
 
 beforeEach(async () => { await db.clearAll(); });
 
@@ -18,7 +18,7 @@ test('with nothing saved, the defaults are used', async () => {
 
 test('order and on/off choices are remembered', async () => {
   let { sections, shortcuts } = await loadLayout();
-  sections = move(sections, 'garden', -1);
+  sections = move(sections, 'beds', -1);
   sections = toggle(sections, 'recent');
   shortcuts = toggle(shortcuts, 'export');
   await saveLayout({ sections, shortcuts });
@@ -37,6 +37,20 @@ test('a section added in a later version slots in at its default place', () => {
   assert.deepEqual(out.map((i) => i.on), [false, true, false]);
   // With nothing before it saved, it goes first.
   assert.deepEqual(ids(resolve(DEFAULTS, [{ id: 'c', on: true }])), ['a', 'b', 'c']);
+});
+
+test('choices saved by the earlier dashboard carry over where they still apply', async () => {
+  await db.setSetting('dashboard', {
+    sections: [{ id: 'backup', on: true }, { id: 'recent', on: true }, { id: 'tidy', on: false }],
+    shortcuts: [{ id: 'export', on: false }, { id: 'beds-home', on: true }],
+  });
+  const { sections, shortcuts } = await loadLayout();
+  assert.equal(sections.some((s) => s.id === 'backup'), false, 'moved to Settings');
+  assert.equal(sections.find((s) => s.id === 'recent').on, true);
+  assert.equal(sections.find((s) => s.id === 'tidy').on, false);
+  assert.equal(sections.find((s) => s.id === 'beds').on, true, 'new section on by default');
+  assert.equal(shortcuts.find((s) => s.id === 'export').on, false);
+  assert.equal(shortcuts.some((s) => s.id === 'beds-home'), false);
 });
 
 test('unknown or repeated saved entries are ignored', () => {
