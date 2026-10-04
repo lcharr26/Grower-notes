@@ -1,8 +1,10 @@
-// Home: the current garden's beds. (Becomes the full bed dashboard in step 4.)
+// Home: inbox nudge and the current garden's beds. (Becomes the full bed
+// dashboard in step 4.)
 
 import * as db from '../db.js';
-import { LOCATION_LABELS, bedsForSite, currentSite, deleteSite, groupBeds } from '../garden.js';
-import { busy, go, h, toast } from '../ui.js';
+import { LOCATION_LABELS, bedsForSite, currentSite, groupBeds } from '../garden.js';
+import { inboxNotes } from '../notes.js';
+import { go, h } from '../ui.js';
 
 export async function render(root) {
   const site = await currentSite();
@@ -10,27 +12,17 @@ export async function render(root) {
 
   const beds = await bedsForSite(site.id);
   const open = (await db.getByIndex('questions', 'site_id', site.id)).filter((q) => q.status === 'open');
+  const inbox = await inboxNotes(site.id);
   const openFor = (bedId) => open.filter((q) => q.bed_ids.includes(bedId)).length;
 
-  const removeBtn = h('button', {
-    onclick: () => busy(removeBtn, 'Removing…', async () => {
-      if (!confirm('Remove the sample garden and everything in it?')) return;
-      await deleteSite(site.id);
-      toast('Sample garden removed.');
-      go('#/');
-    }),
-  }, 'Remove sample');
-
   root.replaceChildren(...[
-    site.sample ? h('section', { class: 'card banner' },
-      h('p', {}, 'You’re looking at a sample garden. Have a poke around; nothing here is yours.'),
-      h('div', { class: 'two' },
-        h('button', { class: 'primary', onclick: () => go('#/site/new') }, 'Set up my garden'),
-        removeBtn,
-      ),
+    h('h2', { class: 'site-title' }, site.name),
+
+    inbox.length ? h('a', { class: 'card inbox-card', href: '#/inbox' },
+      h('strong', {}, `${inbox.length} note${inbox.length > 1 ? 's' : ''} to tidy`),
+      h('span', { class: 'muted small' }, 'Saved without a bed. Tap to tag them.'),
     ) : null,
 
-    h('h2', { class: 'site-title' }, site.name),
 
     beds.length
       ? groupBeds(beds).map(([type, group]) => h('section', { class: 'bed-group' },
@@ -47,5 +39,7 @@ export async function render(root) {
         h('p', {}, 'No beds yet.'),
         h('button', { class: 'primary', onclick: () => go('#/beds?setup') }, 'Add beds'),
       ),
+
+    h('a', { class: 'button', href: '#/notes' }, 'All notes'),
   ].flat().filter(Boolean));
 }

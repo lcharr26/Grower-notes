@@ -1,9 +1,9 @@
 import * as db from '../db.js';
 import { buildExport, parseBackup, restore, saveFile } from '../backup.js';
 import {
-  bedsForSite, currentSite, deleteSite, listSites, loadSample, sampleSite, switchSite,
+  bedsForSite, currentSite, listSites, loadPreset, presetSite, switchSite,
 } from '../garden.js';
-import { makeNote, makePhoto } from '../model.js';
+import { PRESETS } from '../presets.js';
 import { busy, frostText, go, h, megabytes, sinceText, toast } from '../ui.js';
 
 const LABELS = {
@@ -15,8 +15,8 @@ export async function render(root) {
   const site = await currentSite();
   if (!site) return go('#/welcome');
 
-  const [settings, sites, sample, beds] = await Promise.all([
-    db.getSettings(), listSites(), sampleSite(), bedsForSite(site.id),
+  const [settings, sites, derby, beds] = await Promise.all([
+    db.getSettings(), listSites(), presetSite('derby'), bedsForSite(site.id),
   ]);
   const counts = {};
   for (const store of Object.keys(LABELS)) counts[store] = await db.count(store);
@@ -31,22 +31,13 @@ export async function render(root) {
 
   // Gardens on this phone
   const otherSites = sites.filter((s) => s.id !== site.id);
-  const sampleBtn = h('button', {
-    onclick: () => busy(sampleBtn, 'Loading…', async () => {
-      await loadSample();
-      toast('Switched to the sample garden.');
+  const derbyBtn = derby ? null : h('button', {
+    onclick: () => busy(derbyBtn, 'Loading…', async () => {
+      await loadPreset('derby');
+      toast(`Loaded the ${PRESETS.derby.label}.`);
       go('#/');
     }),
-  }, sample ? 'Open the sample garden' : 'Load the sample garden');
-  const removeSampleBtn = sample ? h('button', {
-    class: 'danger',
-    onclick: () => busy(removeSampleBtn, 'Removing…', async () => {
-      if (!confirm('Remove the sample garden and everything in it? Your own garden is not touched.')) return;
-      await deleteSite(sample.id);
-      toast('Sample garden removed.');
-      if (await currentSite()) await rerender(); else go('#/welcome');
-    }),
-  }, 'Remove the sample garden') : null;
+  }, `Load the ${PRESETS.derby.label}`);
 
   // Backup
   const exportBtn = h('button', { class: 'primary', onclick: () => busy(exportBtn, 'Preparing…', doExport) }, 'Export everything');
@@ -80,24 +71,6 @@ export async function render(root) {
     }
   }
 
-  // Test tools (temporary, until quick note arrives in step 3)
-  const noteText = h('textarea', { placeholder: 'A few words…' });
-  const notePhoto = h('input', { type: 'file', accept: 'image/*', multiple: true });
-  const addBtn = h('button', {
-    onclick: () => busy(addBtn, 'Saving…', async () => {
-      const note = makeNote(site.id, { text: noteText.value.trim() });
-      const writes = [];
-      for (const file of notePhoto.files) {
-        const photo = makePhoto(site.id, file, { note_id: note.id });
-        note.photos.push(photo.id);
-        writes.push(['photos', photo]);
-      }
-      writes.push(['notes', note]);
-      await db.putMany(writes);
-      toast(`Saved${note.photos.length ? ` with ${note.photos.length} photo(s)` : ''}.`);
-      await rerender();
-    }),
-  }, 'Save test note');
   const wipeBtn = h('button', {
     class: 'danger',
     onclick: async () => {
@@ -123,10 +96,8 @@ export async function render(root) {
       otherSites.map((s) => h('button', {
         onclick: async () => { await switchSite(s.id); toast(`Switched to ${s.name}.`); go('#/'); },
       }, `Switch to ${s.name}`)),
-      sites.every((s) => s.sample) ? h('button', { class: 'primary', onclick: () => go('#/site/new') }, 'Set up my own garden') : null,
-      site.sample ? null : sampleBtn,
-      removeSampleBtn,
-      sample ? h('p', { class: 'muted small' }, 'The sample garden is separate from yours; removing it never touches your own notes.') : null,
+      h('button', { onclick: () => go('#/site/new') }, 'Set up another garden'),
+      derbyBtn,
     ),
 
     h('section', { class: 'card' },
@@ -149,10 +120,8 @@ export async function render(root) {
         Object.entries(LABELS).map(([store, label]) => h('li', {}, label, h('b', {}, counts[store])))),
       estimate ? h('p', { class: 'muted small' }, `Using about ${megabytes(estimate.usage || 0)}.`) : null,
       h('details', {},
-        h('summary', {}, 'Test tools'),
-        noteText,
-        h('label', { class: 'button file-label' }, 'Add photos', notePhoto),
-        addBtn,
+        h('summary', {}, 'Start again'),
+        h('p', { class: 'muted small' }, 'Wipes this phone clean. Export first if you might want anything back.'),
         wipeBtn,
       ),
     ),

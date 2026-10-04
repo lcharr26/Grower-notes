@@ -1,8 +1,8 @@
-// Sites and beds: creating, editing, switching, and the sample garden.
+// Sites and beds: creating, editing, switching, and ready-made gardens.
 
 import * as db from './db.js';
 import { LOCATION_TYPES, makeBed, makeQuestion, makeSite, makeVariety } from './model.js';
-import { SAMPLE_BEDS, SAMPLE_QUESTIONS, SAMPLE_SITE, SAMPLE_VARIETIES } from './sample.js';
+import { PRESETS } from './presets.js';
 
 export const LOCATION_LABELS = { greenhouse: 'Greenhouse', outdoor: 'Outdoor', informal: 'Informal' };
 export const NUMBERED_PREFIX = { greenhouse: 'GH Bed', outdoor: 'Bed', informal: 'Area' };
@@ -112,36 +112,47 @@ export async function deleteBed(bedId) {
   await db.remove('beds', bedId);
 }
 
-export async function sampleSite() {
-  return (await db.getAll('sites')).find((s) => s.sample) || null;
+export async function presetSite(key) {
+  return (await db.getAll('sites')).find((s) => s.preset === key) || null;
 }
 
-// Loads the sample garden as its own site and switches to it. Loading twice
-// just switches back to the existing copy.
-export async function loadSample() {
-  const existing = await sampleSite();
+// Loads a ready-made garden as an ordinary garden and switches to it.
+// Loading it again just switches back to the existing one.
+export async function loadPreset(key) {
+  const preset = PRESETS[key];
+  if (!preset) throw new Error('Unknown garden.');
+  const existing = await presetSite(key);
   if (existing) {
     await switchSite(existing.id);
     return existing;
   }
-  const site = makeSite({ ...SAMPLE_SITE, sample: true });
+  const site = makeSite({ ...preset.site, preset: key });
   const records = [['sites', site]];
   const bedIds = {};
   let sort = 1;
-  for (const [type, names] of SAMPLE_BEDS) {
+  for (const [type, names] of preset.beds) {
     for (const name of names) {
       const bed = makeBed(site.id, { name, location_type: type, sort: sort++ });
       bedIds[name] = bed.id;
       records.push(['beds', bed]);
     }
   }
-  for (const [crop, variety, supplier] of SAMPLE_VARIETIES) {
+  for (const [crop, variety, supplier] of preset.varieties) {
     records.push(['varieties', makeVariety(site.id, { crop, variety, supplier })]);
   }
-  for (const [bedName, text] of SAMPLE_QUESTIONS) {
+  for (const [bedName, text] of preset.questions) {
     records.push(['questions', makeQuestion(site.id, { bed_ids: [bedIds[bedName]], text })]);
   }
   await db.putMany(records);
   await switchSite(site.id);
   return site;
+}
+
+// Earlier test builds loaded the Derby garden as a removable "sample".
+// It is now a real garden, so convert it in place, keeping anything added.
+export async function upgradeSampleSites() {
+  const old = (await db.getAll('sites')).filter((s) => 'sample' in s);
+  for (const { sample, ...site } of old) {
+    await db.put('sites', { ...site, preset: site.preset || (sample ? 'derby' : null) });
+  }
 }

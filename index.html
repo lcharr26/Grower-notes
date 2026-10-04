@@ -10,12 +10,17 @@
 <body>
   <header class="top">
     <a class="home-link" href="#/"><h1>Growers Notebook</h1></a>
-    <a id="settings-link" class="top-link" href="#/settings" hidden>Settings</a>
+    <nav class="top-nav">
+      <a id="inbox-link" class="top-link" href="#/inbox" hidden>Inbox</a>
+      <a id="settings-link" class="top-link" href="#/settings" hidden>Settings</a>
+    </nav>
   </header>
 
   <main id="app">
     <p class="muted">Loading…</p>
   </main>
+
+  <button id="capture-btn" class="fab" type="button" hidden>+ Note</button>
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 

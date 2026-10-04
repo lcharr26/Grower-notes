@@ -80,3 +80,56 @@ export function frostText(mmdd) {
   if (!mmdd) return null;
   return new Date(`2001-${mmdd}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
 }
+
+// Chips where any number can be on (or none). Returns { el, get values() }.
+export function multiChips(options, selected = [], onchange) {
+  const values = new Set(selected);
+  const el = h('div', { class: 'chips', role: 'group' }, options.map(([key, label]) => {
+    const b = h('button', {
+      type: 'button',
+      class: 'chip',
+      'aria-pressed': String(values.has(key)),
+      onclick: () => {
+        if (values.has(key)) values.delete(key); else values.add(key);
+        b.setAttribute('aria-pressed', String(values.has(key)));
+        if (onchange) onchange([...values]);
+      },
+    }, label);
+    return b;
+  }));
+  return { el, get values() { return [...values]; } };
+}
+
+// Single choice that can also be switched off again. Returns { el, get value() }.
+export function optionalChip(options, selected = null) {
+  let value = selected;
+  const buttons = options.map(([key, label]) => h('button', {
+    type: 'button',
+    class: 'chip',
+    'aria-pressed': String(key === value),
+    onclick: () => {
+      value = value === key ? null : key;
+      for (const [i, b] of buttons.entries()) b.setAttribute('aria-pressed', String(options[i][0] === value));
+    },
+  }, label));
+  return { el: h('div', { class: 'chips', role: 'group' }, buttons), get value() { return value; } };
+}
+
+export function whenText(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  const dayDiff = Math.round((new Date(now.toDateString()) - new Date(d.toDateString())) / 86_400_000);
+  if (dayDiff === 0) return `Today ${time}`;
+  if (dayDiff === 1) return `Yesterday ${time}`;
+  const opts = { weekday: 'short', day: 'numeric', month: 'short' };
+  if (d.getFullYear() !== now.getFullYear()) opts.year = 'numeric';
+  return `${d.toLocaleDateString('en-GB', opts)} ${time}`;
+}
+
+// Full-screen photo viewer; tap anywhere to close.
+export function showPhoto(url) {
+  const overlay = h('div', { class: 'lightbox', role: 'dialog', 'aria-label': 'Photo', onclick: () => overlay.remove() },
+    h('img', { src: url, alt: '' }));
+  document.body.append(overlay);
+}

@@ -52,7 +52,7 @@ export function makeSite(fields = {}) {
     location: fields.location || '',
     last_frost: fields.last_frost || null, // 'YYYY-MM-DD' or 'MM-DD', user set
     first_frost: fields.first_frost || null,
-    sample: Boolean(fields.sample), // the demo garden, removable in one go
+    preset: fields.preset || null, // which ready-made garden it came from, if any
     created: fields.created || nowIso(),
   };
 }
