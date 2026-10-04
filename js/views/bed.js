@@ -7,16 +7,8 @@ import { openCapture } from '../capture.js';
 import { LOCATION_LABELS, currentSite } from '../garden.js';
 import { noteCard } from '../notecard.js';
 import { tagContext } from '../tags.js';
-import { go, h } from '../ui.js';
-
-const STATUS_LABELS = { growing: 'Growing', harvesting: 'Harvesting', finished: 'Finished' };
-
-function dayText(value) {
-  const d = new Date(value.length === 10 ? `${value}T12:00:00` : value);
-  const opts = { weekday: 'short', day: 'numeric', month: 'short' };
-  if (d.getFullYear() !== new Date().getFullYear()) opts.year = 'numeric';
-  return d.toLocaleDateString('en-GB', opts);
-}
+import { dayText, go, h } from '../ui.js';
+import { METHOD_LABELS, STATUS_LABELS } from './planting.js';
 
 // A small line in the history for things that aren't notes.
 function eventRow(event) {
@@ -27,7 +19,7 @@ function eventRow(event) {
       extra ? h('span', { class: 'muted small' }, extra) : null,
       h('span', { class: 'muted small' }, dayText(event.at))));
   switch (event.kind) {
-    case 'sown': return line('•', `Sown: ${event.crop}`, event.planting.method ? `Method: ${event.planting.method}` : null);
+    case 'sown': return line('•', `Sown: ${event.crop}`, event.planting.method ? METHOD_LABELS[event.planting.method] : null);
     case 'planted': return line('•', `Planted out: ${event.crop}`);
     case 'harvest': {
       const { amount, notes } = event.harvest;
@@ -67,12 +59,17 @@ export async function render(root, { id }) {
       h('h2', {}, 'In the ground'),
       crops.length
         ? h('ul', { class: 'plain-list' }, crops.map((c) => h('li', {},
-          h('span', {}, c.name),
-          h('span', { class: 'muted small' }, [
-            STATUS_LABELS[c.status],
-            c.planting.planted ? `planted ${dayText(c.planting.planted)}` : c.planting.sown ? `sown ${dayText(c.planting.sown)}` : null,
-          ].filter(Boolean).join(' · ')))))
+          h('a', { class: 'list-link', href: `#/planting?id=${encodeURIComponent(c.id)}` },
+            h('span', {}, c.name),
+            h('span', { class: 'muted small' }, [
+              STATUS_LABELS[c.status],
+              c.planting.planted ? `planted ${dayText(c.planting.planted)}` : c.planting.sown ? `sown ${dayText(c.planting.sown)}` : null,
+            ].filter(Boolean).join(' · '))))))
         : h('p', { class: 'muted small' }, 'No crops logged here at the moment.'),
+      h('div', { class: 'two' },
+        h('a', { class: 'button', href: `#/planting?bed=${encodeURIComponent(bed.id)}` }, 'Add a crop'),
+        h('a', { class: 'button', href: `#/harvest?bed=${encodeURIComponent(bed.id)}` }, 'Log a harvest'),
+      ),
     ),
 
     h('button', { class: 'primary', onclick: () => openCapture({ bed_ids: [bed.id] }) }, `Add a note for ${bed.name}`),

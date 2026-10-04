@@ -101,7 +101,7 @@ export function multiChips(options, selected = [], onchange) {
 }
 
 // Single choice that can also be switched off again. Returns { el, get value() }.
-export function optionalChip(options, selected = null) {
+export function optionalChip(options, selected = null, onchange) {
   let value = selected;
   const buttons = options.map(([key, label]) => h('button', {
     type: 'button',
@@ -110,6 +110,7 @@ export function optionalChip(options, selected = null) {
     onclick: () => {
       value = value === key ? null : key;
       for (const [i, b] of buttons.entries()) b.setAttribute('aria-pressed', String(options[i][0] === value));
+      if (onchange) onchange(value);
     },
   }, label));
   return { el: h('div', { class: 'chips', role: 'group' }, buttons), get value() { return value; } };
@@ -132,4 +133,30 @@ export function showPhoto(url) {
   const overlay = h('div', { class: 'lightbox', role: 'dialog', 'aria-label': 'Photo', onclick: () => overlay.remove() },
     h('img', { src: url, alt: '' }));
   document.body.append(overlay);
+}
+
+export function todayIso() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// A labelled date with a one-tap "Today". Returns { el, get value() } ('' if unset).
+export function dateField(id, label, value = '') {
+  const input = h('input', { type: 'date', id, value: value || '' });
+  return {
+    el: h('div', { class: 'date-field' },
+      h('label', { class: 'field', for: id }, label),
+      h('div', { class: 'date-row' },
+        input,
+        h('button', { type: 'button', class: 'chip', onclick: () => { input.value = todayIso(); } }, 'Today'))),
+    get value() { return input.value; },
+  };
+}
+
+export function dayText(value) {
+  if (!value) return '';
+  const d = new Date(value.length === 10 ? `${value}T12:00:00` : value);
+  const opts = { weekday: 'short', day: 'numeric', month: 'short' };
+  if (d.getFullYear() !== new Date().getFullYear()) opts.year = 'numeric';
+  return d.toLocaleDateString('en-GB', opts);
 }

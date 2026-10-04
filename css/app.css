@@ -512,3 +512,17 @@ button.quiet, .button.quiet { font-weight: 500; }
   max-height: 200px;
   overflow: auto;
 }
+
+/* Crops, harvests, seeds */
+.date-field { margin-top: 4px; }
+.date-row { display: flex; gap: 8px; align-items: center; }
+.date-row input { flex: 1; min-width: 0; }
+.date-row .chip { flex-shrink: 0; }
+.new-variety input, .editor input[type="text"] { margin-top: 8px; }
+.seed-name { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+.gap-card h2 { font-size: 1.3rem; }
+.row-more summary { min-height: 40px; font-weight: 500; color: var(--muted); font-size: 0.9rem; }
+.row-more button { margin-top: 4px; }
+.card .two { margin-top: 12px; }
+.card .two > .button, .card .two > button { margin-top: 0; }
+.switch { margin-top: 8px; }

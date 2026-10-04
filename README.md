@@ -13,7 +13,7 @@ in IndexedDB. There are no accounts and no server.
 2. [x] Setup flow (site and beds), plus the Derby garden ready to load
 3. [x] Quick note capture and inbox (shown as "Tasks")
 4. [x] Bed dashboard
-5. [ ] Plantings, harvest log and gap-fill prompt
+5. [x] Plantings, harvest log and gap-fill prompt (plus the seed library)
 6. [ ] Question queue and photo prompt
 7. [ ] Export reminder nudge
 8. [ ] Offline/installable PWA, tested on a real phone
@@ -55,6 +55,7 @@ Pages works; just upload the folder.)
 - `js/garden.js`: sites and beds, plus loading a ready-made garden
 - `js/presets.js`: ready-made gardens (the Derby walled kitchen garden)
 - `js/notes.js`: saving, tagging and deleting notes; untagged notes wait in Tasks
+- `js/crops.js`: seed library, crops in the ground, harvests, the gap question
 - `js/bedview.js`: each bed's current crops, last note, open questions and history
 - `js/notecard.js`: the note card (view, tag, edit, delete) used on several screens
 - `js/homelayout.js`: which Home cards and shortcuts show, and their order
@@ -65,4 +66,5 @@ Pages works; just upload the folder.)
 - `js/app.js`: the screen router
 - `sw.js`: service worker; checks every file with the server so an update never
   mixes old and new files, and keeps a copy so the app opens with no signal
-- `js/views/`: one file per screen (welcome, site, beds, home, bed, notes/tasks, settings, customise)
+- `js/views/`: one file per screen (welcome, site, beds, home, bed, planting, harvest, harvests, gap, seeds,
+  notes/tasks, settings, customise)

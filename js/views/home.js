@@ -30,6 +30,9 @@ export async function render(root) {
   const bedLink = (id) => `#/bed?id=${encodeURIComponent(id)}`;
 
   const SHORTCUT_ACTIONS = {
+    harvest: () => go('#/harvest'),
+    seeds: () => go('#/seeds'),
+    harvests: () => go('#/harvests'),
     tasks: () => go('#/tasks'),
     beds: () => go('#/beds'),
     site: () => go('#/site'),

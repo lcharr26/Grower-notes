@@ -42,6 +42,14 @@ test('each bed shows crops in the ground, last note and open questions', async (
   assert.equal(s.get(b7.id).lastNote, null);
 });
 
+test('same-day events read in the order they happen', async () => {
+  const { site, b7, spuds } = await setup();
+  await db.put('plantings', { ...spuds, sown: '2026-09-01', planted: '2026-09-01' });
+  await db.put('harvests', makeHarvest(site.id, { date: '2026-09-01', bed_id: b7.id, planting_id: spuds.id }));
+  const { events } = await bedHistory(site.id, b7.id);
+  assert.deepEqual(events.map((e) => e.kind), ['harvest', 'planted', 'sown']);
+});
+
 test('a bed history has everything that happened there, newest first', async () => {
   const { site, gh, b7, spuds } = await setup();
   await db.put('harvests', makeHarvest(site.id, { date: '2026-07-10', bed_id: b7.id, planting_id: spuds.id, amount: 'a trug' }));

@@ -79,7 +79,10 @@ export async function bedHistory(siteId, bedId) {
     events.push({ kind: 'asked', at: q.created, question: q });
     if (q.status === 'resolved' && q.resolved) events.push({ kind: 'resolved', at: q.resolved, question: q });
   }
-  events.sort((a, b) => sortKey(b.at).localeCompare(sortKey(a.at)));
+  // Same day: sown, then planted, then harvested, then everything else.
+  const RANK = { sown: 0, planted: 1, harvest: 2 };
+  const rank = (e) => RANK[e.kind] ?? 3;
+  events.sort((a, b) => sortKey(b.at).localeCompare(sortKey(a.at)) || rank(b) - rank(a));
 
   return {
     crops: here.filter(inGround).map((p) => ({ id: p.id, name: cropName(p), status: p.status, planting: p })),

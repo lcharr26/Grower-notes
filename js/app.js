@@ -9,8 +9,13 @@ import { go, h } from './ui.js';
 import * as bed from './views/bed.js';
 import * as beds from './views/beds.js';
 import * as customise from './views/customise.js';
+import * as gap from './views/gap.js';
+import * as harvest from './views/harvest.js';
+import * as harvests from './views/harvests.js';
 import * as home from './views/home.js';
 import * as notes from './views/notes.js';
+import * as planting from './views/planting.js';
+import * as seeds from './views/seeds.js';
 import * as settings from './views/settings.js';
 import * as site from './views/site.js';
 import * as welcome from './views/welcome.js';
@@ -27,6 +32,11 @@ const ROUTES = {
   site: () => site.render(app, { isNew: false }),
   bed: (q) => bed.render(app, { id: q.get('id') }),
   beds: (q) => beds.render(app, { setup: q.has('setup'), edit: q.get('edit') }),
+  planting: (q) => planting.render(app, { id: q.get('id'), bed: q.get('bed') }),
+  harvest: (q) => harvest.render(app, { bed: q.get('bed'), planting: q.get('planting') }),
+  harvests: () => harvests.render(app),
+  gap: (q) => gap.render(app, { bed: q.get('bed') }),
+  seeds: () => seeds.render(app),
   tasks: () => notes.render(app, { tasks: true }),
   notes: () => notes.render(app, { tasks: false }),
   settings: () => settings.render(app),

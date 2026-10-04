@@ -17,8 +17,11 @@ export const SECTIONS = [
 
 // [id, label, shown by default]
 export const SHORTCUTS = [
+  ['harvest', 'Log a harvest', true],
+  ['seeds', 'Seed library', true],
   ['tasks', 'Tasks', true],
   ['export', 'Export backup', true],
+  ['harvests', 'Harvest log', false],
   ['beds', 'Add or edit beds', false],
   ['site', 'Garden details', false],
   ['settings', 'Settings', false],
