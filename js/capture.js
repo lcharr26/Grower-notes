@@ -1,5 +1,5 @@
 // Quick note: one button, always there. Photo and/or a few words, optional
-// tags, save. Nothing is required, and untagged notes go to the inbox.
+// tags, save. Nothing is required, and untagged notes wait in Tasks to be tagged.
 
 import { currentSite } from './garden.js';
 import { hasContent, saveNote } from './notes.js';
@@ -79,7 +79,7 @@ export async function openCapture({ bed_ids = [] } = {}) {
         close();
         const where = note.bed_ids.map((id) => tags.bedById.get(id)?.name).filter(Boolean);
         toast(where.length ? `Saved to ${where.join(', ')}.`
-          : note.planting_ids.length ? 'Saved.' : 'Saved to your inbox. Tag it later.');
+          : note.planting_ids.length ? 'Saved.' : 'Saved. It’s in Tasks to tag later.');
         afterSave(note);
       } catch (err) {
         console.error(err);

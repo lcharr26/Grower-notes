@@ -8,7 +8,7 @@ export const PRESETS = {
     site: {
       name: 'Derby walled kitchen garden',
       location: 'Derby, UK',
-      last_frost: '05-10', // rough local averages: edit in Settings
+      last_frost: '05-10', // rough local averages: edit in Dashboard > Garden setup
       first_frost: '10-20',
     },
     beds: [

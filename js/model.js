@@ -110,7 +110,7 @@ export function makeNote(siteId, fields = {}) {
   };
 }
 
-// A note with no bed or planting tags belongs in the inbox.
+// A note with no bed or planting tags waits in Tasks to be tidied.
 export function isUntagged(note) {
   return note.bed_ids.length === 0 && note.planting_ids.length === 0;
 }

@@ -29,7 +29,7 @@ any text editor or spreadsheet tool.
 The photos folder holds every photo as an ordinary image file. Each photo's
 entry in data.json ("photos") says which note it belongs to.
 
-To restore, open Growers Notebook > Settings > Restore from a backup and pick
+To restore, open Growers Notebook > Dashboard > Backup > Restore from a backup and pick
 this file.
 `;
 

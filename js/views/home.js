@@ -1,4 +1,4 @@
-// Home: inbox nudge and the current garden's beds. (Becomes the full bed
+// Home: notes-to-tidy nudge and the current garden's beds. (Becomes the full bed
 // dashboard in step 4.)
 
 import * as db from '../db.js';
@@ -18,7 +18,7 @@ export async function render(root) {
   root.replaceChildren(...[
     h('h2', { class: 'site-title' }, site.name),
 
-    inbox.length ? h('a', { class: 'card inbox-card', href: '#/inbox' },
+    inbox.length ? h('a', { class: 'card inbox-card', href: '#/tasks' },
       h('strong', {}, `${inbox.length} note${inbox.length > 1 ? 's' : ''} to tidy`),
       h('span', { class: 'muted small' }, 'Saved without a bed. Tap to tag them.'),
     ) : null,

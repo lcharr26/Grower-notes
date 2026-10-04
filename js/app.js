@@ -7,15 +7,15 @@ import { inboxNotes } from './notes.js';
 import { releasePhotoUrls } from './photos.js';
 import { go, h } from './ui.js';
 import * as beds from './views/beds.js';
+import * as dashboard from './views/dashboard.js';
 import * as home from './views/home.js';
 import * as notes from './views/notes.js';
-import * as settings from './views/settings.js';
 import * as site from './views/site.js';
 import * as welcome from './views/welcome.js';
 
 const app = document.getElementById('app');
-const settingsLink = document.getElementById('settings-link');
-const inboxLink = document.getElementById('inbox-link');
+const dashboardLink = document.getElementById('dashboard-link');
+const tasksLink = document.getElementById('tasks-link');
 const captureBtn = document.getElementById('capture-btn');
 
 const ROUTES = {
@@ -24,18 +24,21 @@ const ROUTES = {
   'site/new': () => site.render(app, { isNew: true }),
   site: () => site.render(app, { isNew: false }),
   beds: (q) => beds.render(app, { setup: q.has('setup') }),
-  inbox: () => notes.render(app, { inbox: true }),
-  notes: () => notes.render(app, { inbox: false }),
-  settings: () => settings.render(app),
+  tasks: () => notes.render(app, { tasks: true }),
+  notes: () => notes.render(app, { tasks: false }),
+  dashboard: (q) => dashboard.render(app, { customise: q.has('customise') }),
+  // Old addresses, in case they're bookmarked.
+  inbox: () => location.replace('#/tasks'),
+  settings: () => location.replace('#/dashboard'),
 };
 
 // Screens shown before a garden exists, without the garden controls.
 const SETUP_ROUTES = ['welcome', 'site/new'];
 
-async function updateInboxLink(siteId) {
+async function updateTasksLink(siteId) {
   const n = siteId ? (await inboxNotes(siteId)).length : 0;
-  inboxLink.textContent = n ? `Inbox ${n}` : 'Inbox';
-  inboxLink.classList.toggle('has-items', n > 0);
+  tasksLink.textContent = n ? `Tasks ${n}` : 'Tasks';
+  tasksLink.classList.toggle('has-items', n > 0);
 }
 
 async function route() {
@@ -50,10 +53,10 @@ async function route() {
       return;
     }
     const setup = SETUP_ROUTES.includes(path);
-    settingsLink.hidden = inboxLink.hidden = captureBtn.hidden = setup;
-    settingsLink.setAttribute('aria-current', path === 'settings' ? 'page' : 'false');
-    inboxLink.setAttribute('aria-current', path === 'inbox' || path === 'notes' ? 'page' : 'false');
-    await updateInboxLink(current?.id);
+    dashboardLink.hidden = tasksLink.hidden = captureBtn.hidden = setup;
+    dashboardLink.setAttribute('aria-current', path === 'dashboard' ? 'page' : 'false');
+    tasksLink.setAttribute('aria-current', path === 'tasks' ? 'page' : 'false');
+    await updateTasksLink(current?.id);
     await show(new URLSearchParams(query));
   } catch (err) {
     console.error(err);

@@ -11,7 +11,7 @@ in IndexedDB. There are no accounts and no server.
 
 1. [x] Data model, local storage and full export (with restore)
 2. [x] Setup flow (site and beds), plus the Derby garden ready to load
-3. [x] Quick note capture and inbox
+3. [x] Quick note capture and inbox (shown as "Tasks")
 4. [ ] Bed dashboard
 5. [ ] Plantings, harvest log and gap-fill prompt
 6. [ ] Question queue and photo prompt
@@ -27,7 +27,7 @@ in IndexedDB. There are no accounts and no server.
 - `photos/<id>.jpg`: every photo as an ordinary image file
 - `README.txt`: a plain-words description
 
-"Restore from a backup" reads the same file back. It replaces what's on the
+Both live in Dashboard > Backup. "Restore from a backup" reads the same file back. It replaces what's on the
 device in one go, so a failed restore never leaves half the data.
 
 ## Running it
@@ -54,10 +54,11 @@ Pages works; just upload the folder.)
 - `js/backup.js`: export, restore and saving the file
 - `js/garden.js`: sites and beds, plus loading a ready-made garden
 - `js/presets.js`: ready-made gardens (the Derby walled kitchen garden)
-- `js/notes.js`: saving, tagging and deleting notes; the inbox
+- `js/notes.js`: saving, tagging and deleting notes; untagged notes wait in Tasks
+- `js/dashboard.js`: which dashboard cards and shortcuts show, and their order
 - `js/photos.js`: shrinking photos before they're stored
 - `js/capture.js`: the quick note sheet behind the "+ Note" button
 - `js/tags.js`: bed / crop / kind options for tagging
 - `js/ui.js`: small shared UI helpers
 - `js/app.js`: the screen router
-- `js/views/`: one file per screen (welcome, site, beds, home, notes, settings)
+- `js/views/`: one file per screen (welcome, site, beds, home, notes/tasks, dashboard)

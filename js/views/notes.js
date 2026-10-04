@@ -1,5 +1,5 @@
-// Inbox (notes waiting to be tagged) and the full list of notes.
-// Tap a note to tag it, edit it, or delete it.
+// Tasks (for now: notes waiting to be tagged; upcoming tasks will join them
+// here) and the full list of notes. Tap a note to tag, edit or delete it.
 
 import { currentSite } from '../garden.js';
 import { isUntagged } from '../model.js';
@@ -8,7 +8,7 @@ import { photoUrl } from '../photos.js';
 import { TYPE_LABELS, TYPE_OPTIONS, tagContext } from '../tags.js';
 import { busy, go, h, multiChips, optionalChip, showPhoto, toast, whenText } from '../ui.js';
 
-export async function render(root, { inbox }) {
+export async function render(root, { tasks: inbox }) {
   const site = await currentSite();
   if (!site) return go('#/welcome');
 
@@ -94,13 +94,12 @@ export async function render(root, { inbox }) {
     list.replaceChildren(...await Promise.all(shown.map(card)));
   }
 
-  root.replaceChildren(
-    h('div', { class: 'tabs', role: 'tablist' },
-      h('a', { href: '#/inbox', role: 'tab', 'aria-selected': String(Boolean(inbox)) }, `To tidy (${untagged.length})`),
-      h('a', { href: '#/notes', role: 'tab', 'aria-selected': String(!inbox) }, `All notes (${notes.length})`),
-    ),
-    inbox && untagged.length ? h('p', { class: 'muted small' }, 'Notes saved without a bed or crop. Tag them when you have a minute.') : '',
+  root.replaceChildren(...[
+    h('h2', { class: 'site-title' }, inbox ? 'Tasks' : 'All notes'),
+    inbox ? h('h3', {}, `Notes to tidy (${untagged.length})`) : null,
+    inbox && untagged.length ? h('p', { class: 'muted small' }, 'Saved without a bed or crop. Tag them when you have a minute.') : null,
     list,
-  );
+    inbox ? h('a', { class: 'button', href: '#/notes' }, `All notes (${notes.length})`) : null,
+  ].filter(Boolean));
   await refresh();
 }

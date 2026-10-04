@@ -1,4 +1,5 @@
-// Add and edit beds. Used during first setup and later from Settings.
+// Beds: the list first, with adding tucked behind a button. Used during
+// first setup and later from Dashboard > Garden setup.
 
 import {
   LOCATION_LABELS, NUMBERED_PREFIX, addBed, addNumberedBeds, bedsForSite, currentSite,
@@ -73,7 +74,7 @@ export async function render(root, { setup }) {
   async function refresh() {
     const beds = await bedsForSite(site.id);
     if (!beds.length) {
-      list.replaceChildren(h('p', { class: 'muted' }, 'No beds yet. Add them above, or skip this and add them later.'));
+      list.replaceChildren(h('p', { class: 'muted' }, 'No beds yet. Tap “Add beds” above, or skip this and add them later.'));
       return;
     }
     list.replaceChildren(...groupBeds(beds).map(([t, group]) => h('div', { class: 'bed-group' },
@@ -89,24 +90,36 @@ export async function render(root, { setup }) {
     )));
   }
 
-  root.replaceChildren(
-    h('section', { class: 'card' },
-      h('h2', {}, setup ? 'Add your beds' : 'Beds'),
-      h('p', { class: 'muted small' }, setup
-        ? 'Anywhere you grow: beds, greenhouse borders, the strawberry patch. Pick the kind, then add them.'
-        : `Beds in ${site.name}. Tap one to rename it or change its kind.`),
-      type.el,
-      name,
-      addOne,
-      h('div', { class: 'numbered' },
-        h('span', { class: 'muted small' }, 'Or add several at once:'),
-        h('div', { class: 'numbered-row' }, howMany, prefix),
-        addMany,
-      ),
+  const addPanel = h('div', { class: 'add-panel', hidden: true },
+    h('h3', {}, 'Kind of bed'),
+    type.el,
+    name,
+    addOne,
+    h('div', { class: 'numbered' },
+      h('span', { class: 'muted small' }, 'Or add several at once:'),
+      h('div', { class: 'numbered-row' }, howMany, prefix),
+      addMany,
     ),
+  );
+  const addToggle = h('button', {
+    'aria-expanded': 'false',
+    onclick: () => {
+      addPanel.hidden = !addPanel.hidden;
+      addToggle.setAttribute('aria-expanded', String(!addPanel.hidden));
+      addToggle.textContent = addPanel.hidden ? 'Add beds' : 'Finished adding';
+      if (!addPanel.hidden) name.focus();
+    },
+  }, 'Add beds');
+
+  root.replaceChildren(
+    h('h2', { class: 'site-title' }, setup ? 'Your beds' : 'Beds'),
+    h('p', { class: 'muted small' }, setup
+      ? 'Anywhere you grow: beds, greenhouse borders, the strawberry patch. Add them now, or skip and add them later.'
+      : `Beds in ${site.name}. Tap one to rename it, change its kind or add notes.`),
+    h('section', { class: 'card' }, addToggle, addPanel),
     h('section', { class: 'card' }, list),
-    h('button', { class: setup ? 'primary' : '', onclick: () => go(setup ? '#/' : '#/settings') },
-      setup ? 'Done, take me to the garden' : 'Back to settings'),
+    h('button', { class: setup ? 'primary' : '', onclick: () => go(setup ? '#/' : '#/dashboard') },
+      setup ? 'Done, take me to the garden' : 'Back to dashboard'),
   );
   await refresh();
 }

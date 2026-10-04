@@ -27,7 +27,7 @@ export async function render(root, { isNew }) {
       } else {
         await updateSite(site, fields);
         toast('Saved.');
-        go('#/settings');
+        go('#/dashboard');
       }
     }),
   }, isNew ? 'Next: add your beds' : 'Save');
@@ -45,7 +45,7 @@ export async function render(root, { isNew }) {
         h('div', {}, h('label', { class: 'field', for: 'site-first-frost' }, 'First autumn frost'), firstFrost),
       ),
       save,
-      isNew ? null : h('button', { onclick: () => go('#/settings') }, 'Cancel'),
+      isNew ? null : h('button', { onclick: () => go('#/dashboard') }, 'Cancel'),
     ),
   );
   if (isNew) name.focus();

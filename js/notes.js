@@ -1,4 +1,5 @@
-// Notes: save first, tag later. A note with no bed or crop tags is in the inbox.
+// Notes: save first, tag later. A note with no bed or crop tags waits
+// in Tasks ("notes to tidy") until it's tagged.
 
 import * as db from './db.js';
 import { isUntagged, makeNote, makePhoto } from './model.js';
