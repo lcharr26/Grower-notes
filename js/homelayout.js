@@ -59,8 +59,9 @@ export function toggle(list, id) {
 const strip = (list) => list.map(({ id, on }) => ({ id, on }));
 
 export async function loadLayout() {
-  const settings = await db.getSettings();
-  const saved = settings.home_layout || settings.dashboard; // earlier builds used 'dashboard'
+  // Choices from the old Dashboard (an earlier build) aren't carried over:
+  // that screen no longer exists, and its order doesn't fit Home.
+  const { home_layout: saved } = await db.getSettings();
   return {
     sections: resolve(SECTIONS, saved?.sections),
     shortcuts: resolve(SHORTCUTS, saved?.shortcuts),

@@ -40,7 +40,7 @@ export async function render(root, { setup, edit = null }) {
       const n = Math.min(50, Math.max(1, parseInt(howMany.value, 10) || 0));
       const p = prefix.value.trim() || NUMBERED_PREFIX[type.value];
       const beds = await addNumberedBeds(site.id, type.value, p, n);
-      toast(`Added ${beds[0].name}${beds.length > 1 ? ` to ${beds.at(-1).name}` : ''}.`);
+      toast(`Added ${beds[0].name}${beds.length > 1 ? ` to ${beds[beds.length - 1].name}` : ''}.`);
       await refresh();
     }),
   }, 'Add numbered beds');

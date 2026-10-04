@@ -63,4 +63,6 @@ Pages works; just upload the folder.)
 - `js/tags.js`: bed / crop / kind options for tagging
 - `js/ui.js`: small shared UI helpers
 - `js/app.js`: the screen router
+- `sw.js`: service worker; checks every file with the server so an update never
+  mixes old and new files, and keeps a copy so the app opens with no signal
 - `js/views/`: one file per screen (welcome, site, beds, home, bed, notes/tasks, settings, customise)

@@ -498,3 +498,17 @@ button.quiet, .button.quiet { font-weight: 500; }
   text-decoration: none;
 }
 @media (prefers-color-scheme: dark) { .tidy-line { background: #3a3322; } }
+
+/* Start-up error */
+.boot-error { margin: 16px; }
+.boot-detail {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  max-height: 200px;
+  overflow: auto;
+}

@@ -24,6 +24,49 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
+  <section id="boot-error" class="card boot-error" hidden>
+    <h2>The notebook couldn’t start</h2>
+    <p>Your notes are safe on this phone. This usually happens just after an update, when the phone still has some old files saved.</p>
+    <button id="boot-reload" class="primary" type="button">Reload the app</button>
+    <p class="muted small">If it keeps happening, send this message to whoever looks after the app:</p>
+    <pre id="boot-error-detail" class="boot-detail"></pre>
+  </section>
+
+  <!-- Plain script on purpose: it must work even when the app's code can't load. -->
+  <script>
+    (function () {
+      var box = document.getElementById('boot-error');
+      var detail = document.getElementById('boot-error-detail');
+      function show(message) {
+        if (window.__appReady) return; // after start-up, screens handle their own errors
+        detail.textContent = String(message || 'Unknown error') + '\n' + navigator.userAgent;
+        document.getElementById('app').hidden = true;
+        box.hidden = false;
+      }
+      window.addEventListener('error', function (e) {
+        show(e.message || (e.target && e.target.src ? 'Could not load ' + e.target.src : ''));
+      }, true);
+      window.addEventListener('unhandledrejection', function (e) {
+        show(e.reason && (e.reason.stack || e.reason.message) || e.reason);
+      });
+      setTimeout(function () { show('The app took too long to start.'); }, 15000);
+
+      // Throw away every saved copy of the app's files, then start again.
+      document.getElementById('boot-reload').addEventListener('click', function () {
+        var urls = performance.getEntriesByType('resource')
+          .map(function (r) { return r.name; })
+          .filter(function (u) { return u.indexOf(location.origin) === 0; });
+        urls.push(location.href.split('#')[0]);
+        var clearCaches = window.caches
+          ? caches.keys().then(function (keys) { return Promise.all(keys.map(function (k) { return caches.delete(k); })); })
+          : Promise.resolve();
+        clearCaches
+          .then(function () { return Promise.all(urls.map(function (u) { return fetch(u, { cache: 'reload' }).catch(function () {}); })); })
+          .catch(function () {})
+          .then(function () { location.reload(); });
+      });
+    })();
+  </script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

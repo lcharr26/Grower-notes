@@ -83,5 +83,15 @@ if (navigator.storage?.persist) {
   navigator.storage.persisted().then((ok) => ok || navigator.storage.persist()).catch(() => {});
 }
 
+// Keeps the app's files fresh after updates, and available with no signal.
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+  navigator.serviceWorker.register('sw.js').catch((err) => console.warn('Offline support unavailable:', err));
+}
+
 window.addEventListener('hashchange', route);
-upgradeSampleSites().catch(console.error).finally(route);
+upgradeSampleSites().catch(console.error).finally(async () => {
+  await route();
+  window.__appReady = true; // tells the start-up error screen we made it
+  registerServiceWorker();
+});
