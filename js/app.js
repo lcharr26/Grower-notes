@@ -6,6 +6,7 @@ import { currentSite, upgradeSampleSites } from './garden.js';
 import { inboxNotes } from './notes.js';
 import { releasePhotoUrls } from './photos.js';
 import { go, h } from './ui.js';
+import * as bed from './views/bed.js';
 import * as beds from './views/beds.js';
 import * as dashboard from './views/dashboard.js';
 import * as home from './views/home.js';
@@ -23,7 +24,8 @@ const ROUTES = {
   welcome: () => welcome.render(app),
   'site/new': () => site.render(app, { isNew: true }),
   site: () => site.render(app, { isNew: false }),
-  beds: (q) => beds.render(app, { setup: q.has('setup') }),
+  bed: (q) => bed.render(app, { id: q.get('id') }),
+  beds: (q) => beds.render(app, { setup: q.has('setup'), edit: q.get('edit') }),
   tasks: () => notes.render(app, { tasks: true }),
   notes: () => notes.render(app, { tasks: false }),
   dashboard: (q) => dashboard.render(app, { customise: q.has('customise') }),
@@ -65,7 +67,12 @@ async function route() {
   window.scrollTo(0, 0);
 }
 
-captureBtn.addEventListener('click', () => openCapture());
+// On a bed's page, a new note starts tagged with that bed.
+captureBtn.addEventListener('click', () => {
+  const [path, query = ''] = location.hash.replace(/^#\/?/, '').split('?');
+  const bedId = path === 'bed' ? new URLSearchParams(query).get('id') : null;
+  openCapture({ bed_ids: bedId ? [bedId] : [] });
+});
 // Refresh whatever is underneath so the new note shows straight away.
 onNoteSaved(() => go(location.hash || '#/'));
 

@@ -408,3 +408,67 @@ section.card > button:first-child { margin-top: 0; }
 }
 .icon:disabled { opacity: 0.3; cursor: default; }
 @media (max-width: 430px) { .title-long { display: none; } }
+
+/* Bed dashboard cards */
+.bed-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  min-height: 96px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.bed-card:active { background: var(--soft); }
+.bed-card .crops { font-size: 0.92rem; line-height: 1.3; }
+.bed-card .last-note {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: auto;
+}
+.flag {
+  align-self: flex-start;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: #f3dfa8;
+  color: #5a4210;
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+/* Bed page */
+.back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--green);
+  font-weight: 600;
+  text-decoration: none;
+}
+.questions-card { border-color: #e0c27a; background: #fdf7e6; }
+@media (prefers-color-scheme: dark) { .questions-card { background: #3a3322; } .flag { background: #6b5422; color: #fbe9b9; } }
+.history-title { margin-top: 24px; }
+.history .card { margin-bottom: 10px; }
+.event {
+  display: flex;
+  gap: 12px;
+  padding: 10px 4px 14px;
+}
+.event-icon {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--green);
+}
+.event-body { display: flex; flex-direction: column; gap: 2px; }
+button.quiet, .button.quiet { font-weight: 500; }

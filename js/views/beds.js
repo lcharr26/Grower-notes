@@ -10,12 +10,12 @@ import { busy, chips, go, h, toast } from '../ui.js';
 
 const TYPE_OPTIONS = LOCATION_TYPES.map((t) => [t, LOCATION_LABELS[t]]);
 
-export async function render(root, { setup }) {
+export async function render(root, { setup, edit = null }) {
   const site = await currentSite();
   if (!site) return go('#/welcome');
 
   const list = h('div', { class: 'bed-list' });
-  let openEditor = null;
+  let openEditor = edit; // arriving from a bed's page opens that bed
 
   const prefix = h('input', { type: 'text', class: 'prefix', value: NUMBERED_PREFIX.outdoor, 'aria-label': 'Name to number' });
   const type = chips(TYPE_OPTIONS, 'outdoor', (t) => { prefix.value = NUMBERED_PREFIX[t]; });
@@ -118,8 +118,10 @@ export async function render(root, { setup }) {
       : `Beds in ${site.name}. Tap one to rename it, change its kind or add notes.`),
     h('section', { class: 'card' }, addToggle, addPanel),
     h('section', { class: 'card' }, list),
-    h('button', { class: setup ? 'primary' : '', onclick: () => go(setup ? '#/' : '#/dashboard') },
-      setup ? 'Done, take me to the garden' : 'Back to dashboard'),
+    h('button', {
+      class: setup ? 'primary' : '',
+      onclick: () => go(setup ? '#/' : edit ? `#/bed?id=${encodeURIComponent(edit)}` : '#/dashboard'),
+    }, setup ? 'Done, take me to the garden' : edit ? 'Back to the bed' : 'Back to dashboard'),
   );
   await refresh();
 }
