@@ -41,16 +41,18 @@ test('a section added in a later version slots in at its default place', () => {
 
 test('choices saved by the earlier dashboard carry over where they still apply', async () => {
   await db.setSetting('dashboard', {
-    sections: [{ id: 'backup', on: true }, { id: 'recent', on: true }, { id: 'tidy', on: false }],
-    shortcuts: [{ id: 'export', on: false }, { id: 'beds-home', on: true }],
+    sections: [{ id: 'backup', on: true }, { id: 'recent', on: true }, { id: 'questions', on: false }],
+    shortcuts: [{ id: 'export', on: false }, { id: 'beds-home', on: true }, { id: 'note', on: true }],
   });
   const { sections, shortcuts } = await loadLayout();
   assert.equal(sections.some((s) => s.id === 'backup'), false, 'moved to Settings');
   assert.equal(sections.find((s) => s.id === 'recent').on, true);
-  assert.equal(sections.find((s) => s.id === 'tidy').on, false);
+  assert.equal(sections.find((s) => s.id === 'questions').on, false);
+  assert.equal(sections.find((s) => s.id === 'notes').on, true, 'the combined Notes card is new, so on');
   assert.equal(sections.find((s) => s.id === 'beds').on, true, 'new section on by default');
   assert.equal(shortcuts.find((s) => s.id === 'export').on, false);
   assert.equal(shortcuts.some((s) => s.id === 'beds-home'), false);
+  assert.equal(shortcuts.some((s) => s.id === 'note'), false, 'New note now lives in the Notes card');
 });
 
 test('unknown or repeated saved entries are ignored', () => {

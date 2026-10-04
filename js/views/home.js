@@ -30,9 +30,7 @@ export async function render(root) {
   const bedLink = (id) => `#/bed?id=${encodeURIComponent(id)}`;
 
   const SHORTCUT_ACTIONS = {
-    note: () => openCapture(),
     tasks: () => go('#/tasks'),
-    notes: () => go('#/notes'),
     beds: () => go('#/beds'),
     site: () => go('#/site'),
     settings: () => go('#/settings'),
@@ -67,10 +65,17 @@ export async function render(root) {
       }));
     },
 
-    tidy: () => (tidy.length ? h('a', { class: 'card inbox-card', href: '#/tasks' },
-      h('strong', {}, `${tidy.length} note${tidy.length > 1 ? 's' : ''} to tidy`),
-      h('span', { class: 'muted small' }, 'Saved without a bed. Tap to tag them.'),
-    ) : null),
+    notes: () => h('section', { class: 'card notes-card' },
+      h('h2', {}, 'Notes'),
+      tidy.length ? h('a', { class: 'tidy-line', href: '#/tasks' },
+        h('strong', {}, `${tidy.length} note${tidy.length > 1 ? 's' : ''} to tidy`),
+        h('span', { class: 'muted small' }, 'Saved without a bed. Tap to tag them.'),
+      ) : null,
+      h('div', { class: 'two' },
+        h('button', { class: 'primary', onclick: () => openCapture() }, 'New note'),
+        h('a', { class: 'button', href: '#/notes' }, notes.length ? `All notes (${notes.length})` : 'All notes'),
+      ),
+    ),
 
     questions: () => (openQuestions.length ? h('section', { class: 'card questions-card' },
       h('h2', {}, `Open questions (${openQuestions.length})`),

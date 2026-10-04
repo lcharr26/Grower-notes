@@ -8,18 +8,16 @@ import * as db from './db.js';
 // [id, label, shown by default]. Cards with nothing to report stay hidden
 // even when switched on, so Home only shows what matters right now.
 export const SECTIONS = [
-  ['shortcuts', 'Shortcuts', true],
-  ['tidy', 'Notes to tidy', true],
+  ['notes', 'Notes', true], // new note, all notes, and notes to tidy
   ['questions', 'Open questions', true],
+  ['shortcuts', 'Shortcuts', true],
   ['beds', 'Beds', true],
   ['recent', 'Recent notes', false],
 ];
 
 // [id, label, shown by default]
 export const SHORTCUTS = [
-  ['note', 'New note', true],
   ['tasks', 'Tasks', true],
-  ['notes', 'All notes', true],
   ['export', 'Export backup', true],
   ['beds', 'Add or edit beds', false],
   ['site', 'Garden details', false],

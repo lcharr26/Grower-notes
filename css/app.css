@@ -329,7 +329,6 @@ body.sheet-open .fab { display: none; }
 .empty { text-align: center; padding: 24px 0; }
 .thumb-btn { width: auto; min-height: 0; margin: 0; padding: 0; border: 0; background: none; }
 .photos img { width: 84px; height: 84px; }
-.inbox-card { display: flex; flex-direction: column; gap: 2px; color: var(--ink); text-decoration: none; border-color: #e0c27a; }
 
 .lightbox {
   position: fixed;
@@ -484,3 +483,18 @@ button.quiet, .button.quiet { font-weight: 500; }
   color: var(--muted);
   font-size: 0.95rem;
 }
+.notes-card .two { margin-top: 12px; }
+.notes-card .two > * { margin-top: 0; }
+.tidy-line {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+  padding: 10px 12px;
+  border: 1px solid #e0c27a;
+  border-radius: 12px;
+  background: #fdf7e6;
+  color: var(--ink);
+  text-decoration: none;
+}
+@media (prefers-color-scheme: dark) { .tidy-line { background: #3a3322; } }
