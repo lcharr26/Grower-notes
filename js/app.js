@@ -15,6 +15,7 @@ import * as harvests from './views/harvests.js';
 import * as home from './views/home.js';
 import * as notes from './views/notes.js';
 import * as planting from './views/planting.js';
+import * as questions from './views/questions.js';
 import * as seeds from './views/seeds.js';
 import * as settings from './views/settings.js';
 import * as site from './views/site.js';
@@ -37,6 +38,7 @@ const ROUTES = {
   harvests: () => harvests.render(app),
   gap: (q) => gap.render(app, { bed: q.get('bed') }),
   seeds: () => seeds.render(app),
+  questions: () => questions.render(app),
   tasks: () => notes.render(app, { tasks: true }),
   notes: () => notes.render(app, { tasks: false }),
   settings: () => settings.render(app),

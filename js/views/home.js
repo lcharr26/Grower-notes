@@ -8,6 +8,7 @@ import { bedSummaries } from '../bedview.js';
 import { openCapture } from '../capture.js';
 import { LOCATION_LABELS, bedsForSite, currentSite, groupBeds } from '../garden.js';
 import { loadLayout } from '../homelayout.js';
+import { questionItem } from '../questionitem.js';
 import { inboxNotes, notesForSite } from '../notes.js';
 import { TYPE_LABELS } from '../tags.js';
 import { busy, go, h, sinceText, whenText } from '../ui.js';
@@ -26,13 +27,15 @@ export async function render(root) {
     notesForSite(site.id), db.getByIndex('questions', 'site_id', site.id),
   ]);
   const bedById = new Map(beds.map((b) => [b.id, b]));
-  const openQuestions = questions.filter((q) => q.status === 'open');
+  const openQuestions = questions.filter((q) => q.status === 'open')
+    .sort((a, b) => a.created.localeCompare(b.created)); // oldest first
   const bedLink = (id) => `#/bed?id=${encodeURIComponent(id)}`;
 
   const SHORTCUT_ACTIONS = {
     harvest: () => go('#/harvest'),
     seeds: () => go('#/seeds'),
     harvests: () => go('#/harvests'),
+    questions: () => go('#/questions'),
     tasks: () => go('#/tasks'),
     beds: () => go('#/beds'),
     site: () => go('#/site'),
@@ -84,11 +87,13 @@ export async function render(root) {
       h('h2', {}, `Open questions (${openQuestions.length})`),
       h('ul', { class: 'plain-list' }, openQuestions.map((q) => {
         const bedNames = q.bed_ids.map((id) => bedById.get(id)?.name).filter(Boolean);
-        const body = [h('span', {}, q.text), bedNames.length ? h('span', { class: 'muted small' }, bedNames.join(', ')) : null];
-        return h('li', {}, q.bed_ids[0] && bedById.has(q.bed_ids[0])
-          ? h('a', { class: 'list-link', href: bedLink(q.bed_ids[0]) }, body)
-          : body);
+        // The bed name links through to the bed.
+        const where = bedNames.length
+          ? h('a', { class: 'q-where', href: bedLink(q.bed_ids.find((id) => bedById.has(id))) }, bedNames.join(', '))
+          : null;
+        return questionItem(q, { where, onChange: () => go(location.hash) });
       })),
+      h('a', { class: 'button quiet', href: '#/questions' }, 'All questions'),
     ) : null),
 
     beds: () => (beds.length

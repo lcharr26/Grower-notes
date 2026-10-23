@@ -526,3 +526,20 @@ button.quiet, .button.quiet { font-weight: 500; }
 .card .two { margin-top: 12px; }
 .card .two > .button, .card .two > button { margin-top: 0; }
 .switch { margin-top: 8px; }
+
+/* Questions */
+.question { display: flex; flex-direction: column; gap: 4px; }
+.q-text { font-weight: 500; }
+.q-answer { font-size: 0.95rem; }
+.q-answer::before { content: '→ '; color: var(--muted); }
+.q-where { color: var(--green); font-weight: 600; text-decoration: none; }
+.q-actions { display: flex; gap: 8px; margin-top: 4px; }
+.small-btn { width: auto; min-height: 44px; margin: 0; padding: 6px 14px; font-size: 0.95rem; }
+.question input[type="text"] { margin-top: 6px; }
+.question-form textarea { margin-top: 4px; }
+details.card summary { min-height: 44px; }
+.prompt-q .q-text { margin: 0 0 4px; }
+.prompt-q .muted { margin: 0; }
+.done-line { margin: 10px 0 0; color: var(--green); font-weight: 600; }
+.sheet-body > .photos { margin-bottom: 12px; }
+.sheet-head h2 { font-size: 1.05rem; }

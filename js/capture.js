@@ -3,6 +3,7 @@
 
 import { currentSite } from './garden.js';
 import { hasContent, saveNote } from './notes.js';
+import { photoPrompt } from './photoprompt.js';
 import { shrinkPhoto } from './photos.js';
 import { TYPE_OPTIONS, tagContext } from './tags.js';
 import { h, multiChips, optionalChip, toast } from './ui.js';
@@ -80,6 +81,8 @@ export async function openCapture({ bed_ids = [] } = {}) {
         const where = note.bed_ids.map((id) => tags.bedById.get(id)?.name).filter(Boolean);
         toast(where.length ? `Saved to ${where.join(', ')}.`
           : note.planting_ids.length ? 'Saved.' : 'Saved. It’s in Tasks to tag later.');
+        // A photo on a bed with open questions: does it answer any?
+        await photoPrompt(note).catch(console.error);
         afterSave(note);
       } catch (err) {
         console.error(err);

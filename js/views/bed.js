@@ -6,6 +6,7 @@ import { bedHistory } from '../bedview.js';
 import { openCapture } from '../capture.js';
 import { LOCATION_LABELS, currentSite } from '../garden.js';
 import { noteCard } from '../notecard.js';
+import { questionForm, questionItem } from '../questionitem.js';
 import { tagContext } from '../tags.js';
 import { dayText, go, h } from '../ui.js';
 import { METHOD_LABELS, STATUS_LABELS } from './planting.js';
@@ -40,6 +41,18 @@ export async function render(root, { id }) {
   const [history, tags] = await Promise.all([bedHistory(site.id, bed.id), tagContext(site.id)]);
   const { crops, openQuestions, events } = history;
 
+  const refresh = () => go(location.hash);
+
+  // "Ask a question" opens a small form in place.
+  const askBox = h('div', {});
+  const askBtn = h('button', {
+    class: 'quiet',
+    onclick: () => askBox.replaceChildren(questionForm(site.id, tags, {
+      bed_ids: [bed.id], onSaved: refresh, onCancel: () => askBox.replaceChildren(askBtn),
+    })),
+  }, 'Ask a question');
+  askBox.append(askBtn);
+
   const items = [];
   for (const event of events) {
     items.push(event.kind === 'note' ? await noteCard(event.note, tags, { hereBedId: bed.id }) : eventRow(event));
@@ -50,9 +63,11 @@ export async function render(root, { id }) {
     h('h2', { class: 'site-title' }, bed.name),
     h('p', { class: 'muted small' }, LOCATION_LABELS[bed.location_type], bed.notes ? ` · ${bed.notes}` : ''),
 
+    // Open questions come back up every time the bed is opened.
     openQuestions.length ? h('section', { class: 'card questions-card' },
       h('h2', {}, `Open question${openQuestions.length > 1 ? 's' : ''}`),
-      h('ul', { class: 'plain-list' }, openQuestions.map((q) => h('li', {}, q.text))),
+      h('ul', { class: 'plain-list' }, openQuestions.map((q) => questionItem(q, { onChange: refresh }))),
+      askBox,
     ) : null,
 
     h('section', { class: 'card' },
@@ -73,6 +88,7 @@ export async function render(root, { id }) {
     ),
 
     h('button', { class: 'primary', onclick: () => openCapture({ bed_ids: [bed.id] }) }, `Add a note for ${bed.name}`),
+    openQuestions.length ? null : askBox,
 
     h('h3', { class: 'history-title' }, 'History'),
     items.length

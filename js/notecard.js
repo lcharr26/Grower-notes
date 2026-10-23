@@ -3,6 +3,7 @@
 
 import { isUntagged } from './model.js';
 import { deleteNote, photoBlob, updateNote } from './notes.js';
+import { photoPrompt } from './photoprompt.js';
 import { photoUrl } from './photos.js';
 import { TYPE_LABELS, TYPE_OPTIONS } from './tags.js';
 import { busy, go, h, multiChips, optionalChip, showPhoto, toast, whenText } from './ui.js';
@@ -33,6 +34,10 @@ function editor(note, tags, { tidying, onClose }) {
       });
       const where = next.bed_ids.map((id) => tags.bedById.get(id)?.name).filter(Boolean);
       toast(tidying && !isUntagged(next) ? `Tagged${where.length ? ` to ${where.join(', ')}` : ''}.` : 'Saved.');
+      // Newly tagged to a bed or crop? Ask whether the photo answers anything there.
+      const added = next.bed_ids.some((id) => !note.bed_ids.includes(id))
+        || next.planting_ids.some((id) => !note.planting_ids.includes(id));
+      if (added) await photoPrompt(next).catch(console.error);
       go(location.hash);
     }),
   }, 'Save');

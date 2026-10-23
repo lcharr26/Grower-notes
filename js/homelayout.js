@@ -22,6 +22,7 @@ export const SHORTCUTS = [
   ['tasks', 'Tasks', true],
   ['export', 'Export backup', true],
   ['harvests', 'Harvest log', false],
+  ['questions', 'Questions', false],
   ['beds', 'Add or edit beds', false],
   ['site', 'Garden details', false],
   ['settings', 'Settings', false],
