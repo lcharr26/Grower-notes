@@ -4,9 +4,10 @@ import assert from 'node:assert/strict';
 import * as db from '../js/db.js';
 import {
   addBed, addNumberedBeds, bedsForSite, createSite, currentSite, deleteBed, deleteSite,
-  loadPreset, presetSite, updateBed, upgradeSampleSites,
+  loadPreset, presetSite, rewordOldQuestions, updateBed, upgradeSampleSites,
 } from '../js/garden.js';
-import { makeNote } from '../js/model.js';
+import { makeNote, makeQuestion } from '../js/model.js';
+import { GAP_QUESTION } from '../js/crops.js';
 import { PRESETS } from '../js/presets.js';
 
 const DERBY = PRESETS.derby;
@@ -99,4 +100,24 @@ test('deleting a garden leaves other gardens alone', async () => {
   assert.equal(await db.count('notes'), 1);
   assert.equal(await db.count('varieties'), 0);
   assert.equal(await db.count('questions'), 0);
+});
+
+test('questions are yes/no; old wordings are updated, your own are left alone', async () => {
+  const site = await loadPreset('derby');
+  for (const [, text] of DERBY.questions) assert.match(text, /\?/);
+  const bed = (await bedsForSite(site.id))[0];
+  await db.putMany([
+    ['questions', makeQuestion(site.id, { bed_ids: [bed.id], text: 'Watch cucumbers for spider mite', status: 'resolved', resolution_note: 'None' })],
+    ['questions', makeQuestion(site.id, { bed_ids: [bed.id], text: 'What’s going in the gap?' })],
+    ['questions', makeQuestion(site.id, { bed_ids: [bed.id], text: 'My own: lime the beds' })],
+  ]);
+  assert.equal(await rewordOldQuestions(), 2);
+  const texts = (await db.getAll('questions')).map((q) => q.text);
+  assert.ok(texts.includes('Any spider mite on the cucumbers?'));
+  assert.ok(texts.includes(GAP_QUESTION));
+  assert.ok(texts.includes('My own: lime the beds'));
+  assert.equal(texts.filter((t) => t === 'Watch cucumbers for spider mite').length, 0);
+  const answered = (await db.getAll('questions')).find((q) => q.text === 'Any spider mite on the cucumbers?' && q.status === 'resolved');
+  assert.equal(answered.resolution_note, 'None', 'answers are kept');
+  assert.equal(await rewordOldQuestions(), 0, 'nothing left to change');
 });

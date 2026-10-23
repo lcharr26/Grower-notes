@@ -5,7 +5,7 @@
 // Nothing is ever trapped in the app.
 
 import * as db from './db.js';
-import { upgradeSampleSites } from './garden.js';
+import { rewordOldQuestions, upgradeSampleSites } from './garden.js';
 import { STORES } from './model.js';
 import { createZip, readZip } from './zip.js';
 import { megabytes, toast } from './ui.js';
@@ -91,6 +91,7 @@ export async function parseBackup(file) {
 export async function restore(parsed) {
   await db.replaceAll(parsed.data);
   await upgradeSampleSites();
+  await rewordOldQuestions();
   // The backup itself is a known-good export, so the nudge clock starts there.
   if (parsed.exportedAt) await db.setSetting('last_export', parsed.exportedAt);
 }

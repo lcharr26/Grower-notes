@@ -1,7 +1,7 @@
 // "Does this photo answer any of these?" After a photo is saved to (or
 // tagged with) a bed that has open questions, show them. No AI: the grower
-// looks and decides. Each question can be marked answered (linked to the
-// photo), get a note added, or be left as it is.
+// looks and decides. Each question can be answered Yes / No / in a line
+// (linked to the photo), get a note added, or be left as it is.
 
 import { photoBlob, updateNote } from './notes.js';
 import { photoUrl } from './photos.js';
@@ -34,20 +34,28 @@ export async function photoPrompt(note) {
       const box = h('div', { class: 'card prompt-q' });
       const head = [h('p', { class: 'q-text' }, q.text), where(q) ? h('p', { class: 'muted small' }, where(q)) : null];
 
-      const showButtons = () => box.replaceChildren(...head.filter(Boolean),
-        h('div', { class: 'two' },
-          h('button', { class: 'primary', onclick: showAnswer }, 'Yes, answered'),
-          h('button', { onclick: showNote }, 'Add a note')));
+      // Answering here links the answer to this photo.
+      const settle = async (text) => {
+        await resolveQuestion(q, { note: text, byNoteId: current.id });
+        box.replaceChildren(...head.filter(Boolean), h('p', { class: 'done-line' }, `✓ Answered: ${text || 'done'}`));
+      };
+
+      const showButtons = () => {
+        const yes = h('button', { class: 'primary yes-no', onclick: () => busy(yes, '…', () => settle('Yes')) }, 'Yes');
+        const no = h('button', { class: 'yes-no', onclick: () => busy(no, '…', () => settle('No')) }, 'No');
+        box.replaceChildren(...head.filter(Boolean),
+          h('div', { class: 'two q-yes-no' }, yes, no),
+          h('div', { class: 'q-actions' },
+            h('button', { class: 'small-btn quiet', onclick: showAnswer }, 'Other answer'),
+            h('button', { class: 'small-btn quiet', onclick: showNote }, 'Add a note')));
+      };
 
       function showAnswer() {
-        const answer = h('input', { type: 'text', placeholder: 'The answer, in a line (optional)', 'aria-label': 'Answer', autocomplete: 'off' });
+        const answer = h('input', { type: 'text', placeholder: 'The answer, in a line', 'aria-label': 'Answer', autocomplete: 'off' });
         const save = h('button', {
           class: 'primary',
-          onclick: () => busy(save, 'Saving…', async () => {
-            await resolveQuestion(q, { note: answer.value, byNoteId: current.id });
-            box.replaceChildren(...head.filter(Boolean), h('p', { class: 'done-line' }, `✓ Answered${answer.value.trim() ? `: ${answer.value.trim()}` : ''}`));
-          }),
-        }, 'Mark answered');
+          onclick: () => busy(save, 'Saving…', () => settle(answer.value.trim())),
+        }, 'Save answer');
         answer.addEventListener('keydown', (e) => { if (e.key === 'Enter') save.click(); });
         box.replaceChildren(...head.filter(Boolean), answer, save, h('button', { onclick: showButtons }, 'Back'));
         answer.focus();

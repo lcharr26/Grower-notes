@@ -2,6 +2,7 @@
 
 import * as db from './db.js';
 import { LOCATION_TYPES, makeBed, makeQuestion, makeSite, makeVariety } from './model.js';
+import { GAP_QUESTION, OLD_GAP_QUESTIONS } from './crops.js';
 import { PRESETS } from './presets.js';
 
 export const LOCATION_LABELS = { greenhouse: 'Greenhouse', outdoor: 'Outdoor', informal: 'Informal' };
@@ -155,4 +156,17 @@ export async function upgradeSampleSites() {
   for (const { sample, ...site } of old) {
     await db.put('sites', { ...site, preset: site.preset || (sample ? 'derby' : null) });
   }
+}
+
+// Questions are now asked as yes/no where possible. Reword ones saved by
+// earlier versions (the ready-made garden's and "Decide later" gap questions);
+// anything the grower wrote themselves is left alone.
+export async function rewordOldQuestions() {
+  const reworded = new Map(Object.values(PRESETS).flatMap((p) => Object.entries(p.reworded || {})));
+  for (const old of OLD_GAP_QUESTIONS) reworded.set(old, GAP_QUESTION);
+  const changed = (await db.getAll('questions'))
+    .filter((q) => reworded.has(q.text))
+    .map((q) => ['questions', { ...q, text: reworded.get(q.text) }]);
+  if (changed.length) await db.putMany(changed);
+  return changed.length;
 }

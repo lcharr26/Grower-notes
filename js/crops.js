@@ -3,7 +3,9 @@
 import * as db from './db.js';
 import { makeHarvest, makePlanting, makeQuestion, makeVariety } from './model.js';
 
-export const GAP_QUESTION = 'What’s going in the gap?';
+// Asked as yes/no so it can be answered with one tap; Yes goes to adding a crop.
+export const GAP_QUESTION = 'Plant something in the gap?';
+export const OLD_GAP_QUESTIONS = ['What’s going in the gap?'];
 
 // ---- Seed library -------------------------------------------------------
 

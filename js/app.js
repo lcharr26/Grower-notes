@@ -2,7 +2,7 @@
 // always-visible capture button.
 
 import { onNoteSaved, openCapture } from './capture.js';
-import { currentSite, upgradeSampleSites } from './garden.js';
+import { currentSite, rewordOldQuestions, upgradeSampleSites } from './garden.js';
 import { inboxNotes } from './notes.js';
 import { releasePhotoUrls } from './photos.js';
 import { go, h } from './ui.js';
@@ -102,7 +102,8 @@ function registerServiceWorker() {
 }
 
 window.addEventListener('hashchange', route);
-upgradeSampleSites().catch(console.error).finally(async () => {
+// Bring data saved by earlier versions up to date before showing anything.
+Promise.all([upgradeSampleSites(), rewordOldQuestions()]).catch(console.error).finally(async () => {
   await route();
   window.__appReady = true; // tells the start-up error screen we made it
   registerServiceWorker();

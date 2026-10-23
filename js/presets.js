@@ -32,11 +32,17 @@ export const PRESETS = {
       ['Potato', 'Pentland Javelin', "Mr Fothergill's"],
       ['Cabbage', 'Offenham', "Mr Fothergill's"],
     ],
-    // [bed name, question]
+    // [bed name, question]. Yes/no wherever possible: one tap to answer.
     questions: [
-      ['Bed 7', 'Three sisters next season, or Christmas potatoes now?'],
-      ['GH Bed 2', 'Broken-stem tomato: still open'],
-      ['GH Bed 1', 'Watch cucumbers for spider mite'],
+      ['Bed 7', 'Christmas potatoes in Bed 7 now? (No = three sisters next season)'],
+      ['GH Bed 2', 'Has the broken-stem tomato recovered?'],
+      ['GH Bed 1', 'Any spider mite on the cucumbers?'],
     ],
+    // Earlier wordings, so questions already on a phone can be updated.
+    reworded: {
+      'Three sisters next season, or Christmas potatoes now?': 'Christmas potatoes in Bed 7 now? (No = three sisters next season)',
+      'Broken-stem tomato: still open': 'Has the broken-stem tomato recovered?',
+      'Watch cucumbers for spider mite': 'Any spider mite on the cucumbers?',
+    },
   },
 };
