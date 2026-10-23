@@ -19,7 +19,7 @@ export function questionItem(q, { where = null, onChange }) {
       go(`#/planting?bed=${encodeURIComponent(q.bed_ids[0])}`);
       return;
     }
-    toast(`Answered: ${text || 'done'}.`);
+    toast(`Answered: ${text}.`);
     onChange();
   }
 
@@ -40,7 +40,10 @@ export function questionItem(q, { where = null, onChange }) {
     const text = h('input', { type: 'text', placeholder: 'The answer, in a line', 'aria-label': 'Answer', autocomplete: 'off' });
     const save = h('button', {
       class: 'primary',
-      onclick: () => busy(save, 'Saving…', () => answer(text.value.trim())),
+      onclick: () => {
+        if (!text.value.trim()) { toast('Type the answer first, or use Yes / No.'); text.focus(); return; }
+        busy(save, 'Saving…', () => answer(text.value.trim()));
+      },
     }, 'Save answer');
     text.addEventListener('keydown', (e) => { if (e.key === 'Enter') save.click(); });
     item.replaceChildren(

@@ -37,7 +37,7 @@ export async function photoPrompt(note) {
       // Answering here links the answer to this photo.
       const settle = async (text) => {
         await resolveQuestion(q, { note: text, byNoteId: current.id });
-        box.replaceChildren(...head.filter(Boolean), h('p', { class: 'done-line' }, `✓ Answered: ${text || 'done'}`));
+        box.replaceChildren(...head.filter(Boolean), h('p', { class: 'done-line' }, `✓ Answered: ${text}`));
       };
 
       const showButtons = () => {
@@ -54,7 +54,10 @@ export async function photoPrompt(note) {
         const answer = h('input', { type: 'text', placeholder: 'The answer, in a line', 'aria-label': 'Answer', autocomplete: 'off' });
         const save = h('button', {
           class: 'primary',
-          onclick: () => busy(save, 'Saving…', () => settle(answer.value.trim())),
+          onclick: () => {
+            if (!answer.value.trim()) { toast('Type the answer first, or use Yes / No.'); answer.focus(); return; }
+            busy(save, 'Saving…', () => settle(answer.value.trim()));
+          },
         }, 'Save answer');
         answer.addEventListener('keydown', (e) => { if (e.key === 'Enter') save.click(); });
         box.replaceChildren(...head.filter(Boolean), answer, save, h('button', { onclick: showButtons }, 'Back'));

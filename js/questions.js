@@ -25,13 +25,17 @@ export async function updateQuestion(question, fields) {
   return next;
 }
 
-// note: optional one-line answer. byNoteId: the note (or photo) that settled it.
+// A question is only closed with its answer ('Yes', 'No' or a line of words),
+// so the record always says where things stand. byNoteId: the note (or
+// photo) that settled it.
 export async function resolveQuestion(question, { note = '', byNoteId = null } = {}) {
+  const answer = (note || '').trim().split('\n')[0].trim();
+  if (!answer) throw new Error('Give an answer first: Yes, No, or a few words.');
   const next = {
     ...question,
     status: 'resolved',
     resolved: nowIso(),
-    resolution_note: (note || '').trim().split('\n')[0],
+    resolution_note: answer,
     resolved_by_note_id: byNoteId,
   };
   await db.put('questions', next);

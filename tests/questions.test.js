@@ -20,6 +20,15 @@ async function setup() {
   return { site, gh1, gh2, cukes };
 }
 
+test('a question can only be closed with an answer', async () => {
+  const { site, gh1 } = await setup();
+  const q = await addQuestion(site.id, { text: 'Spider mite?', bed_ids: [gh1.id] });
+  await assert.rejects(resolveQuestion(q), /answer/);
+  await assert.rejects(resolveQuestion(q, { note: '   \n' }), /answer/);
+  assert.equal((await db.get('questions', q.id)).status, 'open');
+  assert.equal((await resolveQuestion(q, { note: 'No' })).resolution_note, 'No');
+});
+
 test('add, edit, resolve with a one-line answer, reopen, delete', async () => {
   const { site, gh1 } = await setup();
   await assert.rejects(addQuestion(site.id, { text: '  ' }), /question/);
@@ -54,7 +63,7 @@ test('a photo note finds the open questions on its bed and crops', async () => {
   const onCrop = await addQuestion(site.id, { text: 'Cucumbers bitter?', planting_ids: [cukes.id] });
   const elsewhere = await addQuestion(site.id, { text: 'Broken stem', bed_ids: [gh2.id] });
   const answered = await addQuestion(site.id, { text: 'Old one', bed_ids: [gh1.id] });
-  await resolveQuestion(answered);
+  await resolveQuestion(answered, { note: 'Yes' });
 
   const byBed = await saveNote(site.id, { bed_ids: [gh1.id] });
   assert.deepEqual(await found(byBed), ids(onBed, onCrop));
