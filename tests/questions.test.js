@@ -47,6 +47,9 @@ test('add, edit, resolve with a one-line answer, reopen, delete', async () => {
 
 test('a photo note finds the open questions on its bed and crops', async () => {
   const { site, gh1, gh2, cukes } = await setup();
+  // Which questions come back matters, not their order (same-millisecond ties).
+  const found = async (note) => (await openQuestionsForNote(note)).map((q) => q.id).sort();
+  const ids = (...qs) => qs.map((q) => q.id).sort();
   const onBed = await addQuestion(site.id, { text: 'Spider mite?', bed_ids: [gh1.id] });
   const onCrop = await addQuestion(site.id, { text: 'Cucumbers bitter?', planting_ids: [cukes.id] });
   const elsewhere = await addQuestion(site.id, { text: 'Broken stem', bed_ids: [gh2.id] });
@@ -54,14 +57,14 @@ test('a photo note finds the open questions on its bed and crops', async () => {
   await resolveQuestion(answered);
 
   const byBed = await saveNote(site.id, { bed_ids: [gh1.id] });
-  assert.deepEqual((await openQuestionsForNote(byBed)).map((q) => q.id), [onBed.id, onCrop.id]);
+  assert.deepEqual(await found(byBed), ids(onBed, onCrop));
 
   // Tagged only with the crop: its bed's questions count too.
   const byCrop = await saveNote(site.id, { planting_ids: [cukes.id] });
-  assert.deepEqual((await openQuestionsForNote(byCrop)).map((q) => q.id), [onBed.id, onCrop.id]);
+  assert.deepEqual(await found(byCrop), ids(onBed, onCrop));
 
   const other = await saveNote(site.id, { bed_ids: [gh2.id] });
-  assert.deepEqual((await openQuestionsForNote(other)).map((q) => q.id), [elsewhere.id]);
+  assert.deepEqual(await found(other), ids(elsewhere));
 
   assert.deepEqual(await openQuestionsForNote(await saveNote(site.id, { text: 'untagged' })), []);
 });
